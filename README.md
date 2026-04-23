@@ -143,40 +143,6 @@ All four methods reported ≈100% accuracy. That is **theoretically impossible**
 
 ---
 
-## 🐛 The Six Bugs — Full Audit
-
-```
-  ┌─────┬──────────┬──────────────────────────────────────────────────────────┐
-  │ ID  │ Severity │ Description & Fix                                        │
-  ├─────┼──────────┼──────────────────────────────────────────────────────────┤
-  │ A   │ 🔴 CRIT  │ TBPTT loss over every chunk → cue chunk trivially        │
-  │     │          │ solvable. Fix: loss restricted to final chunk only.       │
-  ├─────┼──────────┼──────────────────────────────────────────────────────────┤
-  │ B   │ 🔴 CRIT  │ spikes.mean(dim=1) included cue window — any model       │
-  │     │          │ firing differently at t=0..4 could classify.              │
-  │     │          │ Fix: rate = (spikes * mask).sum() / mask.sum()            │
-  ├─────┼──────────┼──────────────────────────────────────────────────────────┤
-  │ C   │ 🔴 CRIT  │ Dataset returned (x, label) with no mask. No trainer     │
-  │     │          │ could distinguish which timesteps mattered.               │
-  │     │          │ Fix: Dataset now returns (x, label, readout_mask).        │
-  ├─────┼──────────┼──────────────────────────────────────────────────────────┤
-  │ D   │ 🔴 CRIT  │ CTCA backward sweep propagated cue errors equally.       │
-  │     │          │ Cue-window errors dominated, head learned a shortcut.     │
-  │     │          │ Fix: ro_scale = 1/n_ro if mask[t] else 0.                │
-  ├─────┼──────────┼──────────────────────────────────────────────────────────┤
-  │ E   │ 🔴 CRIT  │ Original cue=20, delay=30. TBPTT(K=10) spanned 2 cue    │
-  │     │          │ chunks — no long-range memory needed at all.              │
-  │     │          │ Fix: cue=5, delay=45, distractor_rate=0.10               │
-  ├─────┼──────────┼──────────────────────────────────────────────────────────┤
-  │ F   │ 🟡 WARN  │ E-prop had no rate regularisation → near-silent network. │
-  │     │          │ Fix: dW += -lr * rate_reg * (rate - target_rate) * trace  │
-  └─────┴──────────┴──────────────────────────────────────────────────────────┘
-```
-
-> *Finding and documenting your own bugs honestly is harder than publishing inflated results. We chose harder.*
-
----
-
 ## 🎯 The Task — Delayed XOR
 
 ```
@@ -467,11 +433,13 @@ This metric is the central diagnostic. It is the difference between a model that
 @misc{snn_ctca_v2,
   title   = {SNN-CTCA v2: Causal Temporal Credit Assignment in Spiking Neural Networks —
              Bug Analysis, Experimental Replication, and Comparison with E-prop},
-  author  = {[Your Name]},
+  author  = {Mani Pal},
   year    = {2025},
-  url     = {https://github.com/[your-repo]}
+  url     = {https://github.com/manipal/snn-ctca}
 }
 ```
+
+> **Author & Codebase Owner — Mani Pal**
 
 ---
 
